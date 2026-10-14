@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DX Job Strategy Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --error: #dc2626;
+      --error-light: #fef2f2;
+      --c1: #2563eb; --c2: #6366f1; --c3: #10b981; --c4: #f59e0b;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --card-bg: #1e293b;
+        --border: #334155;
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --accent: #3b82f6;
+        --accent-light: #1e3a8a;
+        --error: #ef4444;
+        --error-light: #450a0a;
+        --c1: #3b82f6; --c2: #818cf8; --c3: #34d399; --c4: #fbbf24;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; background: var(--bg); color: var(--text); padding: 12px; }
+    .container { max-width: 900px; margin: auto; display: flex; flex-direction: column; gap: 12px; }
+    
+    /* Top Bar */
+    .top-bar { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .select-group { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 220px; }
+    select.main-select { flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); font-weight: 600; outline: none; cursor: pointer; }
+    .btn { padding: 8px 14px; border-radius: 8px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.15s; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-danger { background: transparent; color: var(--error); border: 1px solid var(--error); }
+    .badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .badge-S { background: #ede9fe; color: #6d28d9; }
+    .badge-A { background: #dbeafe; color: #1d4ed8; }
+    .badge-B { background: #fef3c7; color: #b45309; }
+    .badge-C { background: #fee2e2; color: #b91c1c; }
+    .tag { background: var(--border); color: var(--text); padding: 4px 10px; border-radius: 999px; font-size: 12px; }
+
+    /* Visual Grid */
+    .grid { display: grid; grid-template-columns: 280px 1fr; gap: 12px; }
+    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
+    
+    /* Chart Section */
+    .chart-box { position: relative; height: 180px; width: 100%; }
+    .chart-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
+    .chart-center .val { font-size: 22px; font-weight: 800; }
+    .chart-center .lbl { font-size: 11px; color: var(--text-muted); }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* Strategy & Minefield */
+    .box-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .strategy-box { background: var(--accent-light); border-left: 4px solid var(--accent); padding: 10px 12px; border-radius: 6px; font-size: 13px; line-height: 1.45; }
+    .minefield-box { background: var(--error-light); border-left: 4px solid var(--error); padding: 10px 12px; border-radius: 6px; font-size: 13px; line-height: 1.45; }
+
+    /* Sliders */
+    .slider-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+    .slider-row label { width: 90px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .slider-row input { flex: 1; accent-color: var(--accent); }
+    .slider-row span { min-width: 38px; text-align: right; font-size: 12px; font-weight: 700; font-family: monospace; }
+
+    /* Modal for Gemini Input */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 99; }
+    .modal { background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 520px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .modal textarea { width: 100%; height: 160px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-family: monospace; font-size: 12px; margin: 10px 0; outline: none; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="select-group">
+      <select id="compSelect" class="main-select" onchange="switchCompany(this.value)"></select>
+      <span id="compRating" class="badge"></span>
+      <span id="compAttr" class="tag"></span>
+    </div>
+    <div style="display: flex; gap: 6px;">
+      <button class="btn btn-primary" onclick="openModal()">📥 导入 Gemini 数据</button>
+      <button class="btn btn-danger" onclick="deleteCurrentCompany()">🗑</button>
+    </div>
+  </div>
+
+  <!-- Visual Grid -->
+  <div class="grid">
+    <!-- Chart -->
+    <div class="card" style="align-items: center;">
+      <div class="chart-box">
+        <canvas id="myChart"></canvas>
+        <div class="chart-center">
+          <div class="val" id="topVal">--%</div>
+          <div class="lbl" id="topLbl">最高维度</div>
+        </div>
+      </div>
+      <div class="legend" id="customLegend"></div>
+    </div>
+
+    <!-- Strategy -->
+    <div class="card">
+      <div>
+        <div class="box-title">ES 核心撰写策略</div>
+        <div class="strategy-box" id="strategyText">--</div>
+      </div>
+      <div>
+        <div class="box-title">高危避坑 / 排雷提示</div>
+        <div class="minefield-box" id="minefieldText">--</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Micro-adjustment Sliders -->
+  <div class="card" style="gap: 4px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+      <span style="font-size: 13px; font-weight: 700;">选考权重微调（实时联动）</span>
+      <button class="btn" style="padding: 2px 8px; font-size: 11px; background: var(--border); color: var(--text);" onclick="resetWeights()">重置</button>
+    </div>
+    <div id="slidersDeck"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 style="font-size: 16px;">📥 粘贴 Gemini 生成的分析数据</h3>
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">将 Gemini 提供的 JSON 代码块完整复制并粘贴在此处：</p>
+    <textarea id="geminiJsonInput" placeholder='{\n  "name": "企业名",\n  "rating": "S",\n  "attr": "SaaS / 自立型",\n  "weights": [30, 40, 20, 10],\n  "strategy": "...",\n  "minefield": "..."\n}'></textarea>
+    <div style="display: flex; justify-content: flex-end; gap: 8px;">
+      <button class="btn" style="background: var(--border); color: var(--text);" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="importGeminiData()">解析并导入</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DIMS = ["ガクチカ", "自己PR", "志望動機", "逆質問/論理"];
+  const COLORS = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'];
+  let db = JSON.parse(localStorage.getItem('gemini_dx_db')) || {};
+  let currentKey = "";
+  let chart = null;
+
+  // Init Chart
+  function initChart() {
+    const ctx = document.getElementById('myChart').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: DIMS,
+        datasets: [{
+          data: [25, 25, 25, 25],
+          backgroundColor: ['#2563eb', '#6366f1', '#10b981', '#f59e0b'],
+          borderWidth: 2,
+          cutout: '72%'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        animation: { duration: 250 }
+      }
+    });
+
+    // Render Sliders HTML
+    document.getElementById('slidersDeck').innerHTML = DIMS.map((d, i) => `
+      <div class="slider-row">
+        <label><span class="dot" style="background: ${['#2563eb', '#6366f1', '#10b981', '#f59e0b'][i]}"></span>${d}</label>
+        <input type="range" id="s_${i}" min="0" max="100" value="25" oninput="onSliderMove(${i}, this.value)">
+        <span id="v_${i}">25%</span>
+      </div>
+    `).join('');
+
+    // Render Legend HTML
+    document.getElementById('customLegend').innerHTML = DIMS.map((d, i) => `
+      <div class="legend-item"><span class="dot" style="background: ${['#2563eb', '#6366f1', '#10b981', '#f59e0b'][i]}"></span>${d}</div>
+    `).join('');
+  }
+
+  function renderUI() {
+    const keys = Object.keys(db);
+    const sel = document.getElementById('compSelect');
+    
+    if (keys.length === 0) {
+      sel.innerHTML = '<option value="">(请导入首家企业数据)</option>';
+      document.getElementById('compRating').textContent = "";
+      document.getElementById('compAttr').textContent = "";
+      document.getElementById('strategyText').textContent = "暂无数据，请点击右上角【📥 导入 Gemini 数据】";
+      document.getElementById('minefieldText').textContent = "暂无数据";
+      return;
+    }
+
+    if (!currentKey || !db[currentKey]) currentKey = keys[0];
+
+    sel.innerHTML = keys.map(k => `<option value="${k}" ${k === currentKey ? 'selected' : ''}>${db[k].name}</option>`).join('');
+    
+    const curr = db[currentKey];
+    const rBadge = document.getElementById('compRating');
+    rBadge.textContent = `${curr.rating}级`;
+    rBadge.className = `badge badge-${curr.rating}`;
+    document.getElementById('compAttr').textContent = curr.attr;
+    document.getElementById('strategyText').textContent = curr.strategy;
+    document.getElementById('minefieldText').textContent = curr.minefield;
+
+    updateWeights(curr.weights, false);
+  }
+
+  function updateWeights(weights, updateLocal = true) {
+    if (updateLocal && db[currentKey]) {
+      db[currentKey].weights = weights;
+      localStorage.setItem('gemini_dx_db', JSON.stringify(db));
+    }
+    const total = weights.reduce((a, b) => a + b, 0) || 1;
+    const normalized = weights.map(w => Math.round((w / total) * 100));
+
+    let maxIdx = 0;
+    normalized.forEach((v, i) => { if (v > normalized[maxIdx]) maxIdx = i; });
+    document.getElementById('topVal').textContent = `${normalized[maxIdx]}%`;
+    document.getElementById('topLbl').textContent = `最高: ${DIMS[maxIdx]}`;
+
+    normalized.forEach((v, i) => {
+      document.getElementById(`s_${i}`).value = weights[i];
+      document.getElementById(`v_${i}`).textContent = `${v}%`;
+    });
+
+    if (chart) {
+      chart.data.datasets[0].data = normalized;
+      chart.update();
+    }
+  }
+
+  function onSliderMove(idx, val) {
+    if (!currentKey || !db[currentKey]) return;
+    const w = [...db[currentKey].weights];
+    w[idx] = parseFloat(val) || 0;
+    updateWeights(w, true);
+  }
+
+  function resetWeights() {
+    if (!currentKey || !db[currentKey] || !db[currentKey]._origWeights) return;
+    updateWeights([...db[currentKey]._origWeights], true);
+  }
+
+  function switchCompany(key) {
+    currentKey = key;
+    renderUI();
+  }
+
+  function deleteCurrentCompany() {
+    if (!currentKey || !confirm(`确定删除 ${db[currentKey].name} 吗？`)) return;
+    delete db[currentKey];
+    localStorage.setItem('gemini_dx_db', JSON.stringify(db));
+    currentKey = Object.keys(db)[0] || "";
+    renderUI();
+  }
+
+  // Modal & Import
+  function openModal() { document.getElementById('modal').style.display = 'flex'; }
+  function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+  function importGeminiData() {
+    try {
+      const raw = document.getElementById('geminiJsonInput').value.trim();
+      const data = JSON.parse(raw);
+      if (!data.name || !data.weights) throw new Error();
+      
+      const key = data.name.toLowerCase().replace(/[^a-z0-9]/g, '_') || Date.now().toString();
+      data._origWeights = [...data.weights];
+      db[key] = data;
+      localStorage.setItem('gemini_dx_db', JSON.stringify(db));
+      currentKey = key;
+      closeModal();
+      document.getElementById('geminiJsonInput').value = '';
+      renderUI();
+    } catch (e) {
+      alert("❌ JSON 格式有误，请确保完整复制了 Gemini 输出的英文大括号内容！");
+    }
+  }
+
+  // URL auto-loader (?data=...)
+  window.addEventListener('DOMContentLoaded', () => {
+    initChart();
+    renderUI();
+    // Auto import URL params if present
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('data')) {
+      try {
+        const obj = JSON.parse(decodeURIComponent(params.get('data')));
+        const key = obj.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        obj._origWeights = [...obj.weights];
+        db[key] = obj;
+        currentKey = key;
+        renderUI();
+      } catch(e){}
+    }
+  });
+</script>
+</body>
+</html>
