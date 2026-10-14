@@ -3,296 +3,622 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DX Job Hunter Workbench v1.0</title>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;600;700&family=Google+Sans+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>DX STUDIO — 1894 Editorial Edition</title>
+  <!-- 强制加载同源字重的中日双语字体 + 等宽数字字体，彻底解决字号忽大忽小问题 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;900&family=JetBrains+Mono:wght@600;800&family=Noto+Sans+JP:wght@500;700;900&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --ff-sans: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --ff-mono: 'Google Sans Code', monospace;
-      --bg-app: #f4f4f6;
-      --surface: #ffffff;
-      --surface-dim: #f2f0f0;
-      --surface-hover: #e8eaed;
-      --on-surface: #18181b;
-      --on-surface-muted: #686b72;
-      --stroke: #e2e4e8;
-      --primary: #2563eb;
-      --primary-bg: #dbeafe;
-      --positive: #059669;
-      --positive-bg: #d1fae5;
-      --warn: #d97706;
-      --warn-bg: #fef3c7;
-      --danger: #dc2626;
-      --danger-bg: #fee2e2;
-      --radius-m: 12px;
-      --radius-s: 8px;
+      /* 统一中日双语字体栈：优先使用字面框100%一致的同源黑体 */
+      --ff-unified: 'Inter', 'Noto Sans SC', 'Noto Sans JP', "PingFang SC", "Hiragino Sans", sans-serif;
+      --ff-mono: 'JetBrains Mono', monospace;
+
+      /* Merus 1894 灵感：高对比阳光暖白 × 信号朱红 × 曜石黑 */
+      --bg-paper: #FBFBF9;
+      --surface-card: #FFFFFF;
+      --surface-subtle: #F4F3EF;
+      --ink-black: #0D0D0D;
+      --ink-CHARCOAL: #3F3F46;
+      --ink-muted: #71717A;
+      --brand-red: #E60012;
+      --brand-red-soft: #FFF0F0;
+      --brand-red-border: #FFCCD0;
+      --border-line: #E4E4E0;
+      --border-strong: #0D0D0D;
+
+      --radius-apple: 18px;
+      --radius-inner: 12px;
+      --shadow-apple: 0 8px 30px rgba(13, 13, 13, 0.04), 0 2px 6px rgba(13, 13, 13, 0.02);
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-app: #09090b;
-        --surface: #141417;
-        --surface-dim: #1f1f23;
-        --surface-hover: #27272c;
-        --on-surface: #e4e4e7;
-        --on-surface-muted: #9ca3af;
-        --stroke: #2d2d35;
-        --primary: #60a5fa;
-        --primary-bg: #1e3a8a;
-        --positive: #34d399;
-        --positive-bg: #064e3b;
-        --warn: #fbbf24;
-        --warn-bg: #451a03;
-        --danger: #f87171;
-        --danger-bg: #450a0a;
-      }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      font-optical-sizing: auto;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
     body, html {
-      width: 100%; height: 100vh; overflow: hidden;
-      font-family: var(--ff-sans); background: var(--bg-app); color: var(--on-surface);
-      font-size: 13.5px; line-height: 1.5;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      font-family: var(--ff-unified);
+      background-color: var(--bg-paper);
+      color: var(--ink-black);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.65;
+      letter-spacing: 0.01em;
     }
 
-    /* Top Navigation Bar */
-    .topbar {
-      height: 54px; background: var(--surface); border-bottom: 1px solid var(--stroke);
-      display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    /* ====== 顶部杂志刊头导航栏 (Magazine Masthead) ====== */
+    .masthead {
+      height: 64px;
+      background: rgba(251, 251, 249, 0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 2px solid var(--ink-black);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
     }
-    .topbar-left, .topbar-right { display: flex; align-items: center; gap: 10px; }
-    .brand-title { font-family: var(--ff-mono); font-weight: 700; font-size: 14px; letter-spacing: -0.3px; }
+    .masthead-left, .masthead-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--ff-mono);
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: -0.5px;
+      color: var(--ink-black);
+    }
+    .brand-dot {
+      width: 12px;
+      height: 12px;
+      background: var(--brand-red);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* 统一表单控件样式 */
     select, input, textarea {
-      font-family: var(--ff-sans); font-size: 13px; color: var(--on-surface);
-      background: var(--surface-dim); border: 1px solid var(--stroke); border-radius: var(--radius-s);
-      padding: 6px 10px; outline: none;
+      font-family: var(--ff-unified);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.6;
+      color: var(--ink-black);
+      background: var(--surface-subtle);
+      border: 1.5px solid var(--border-line);
+      border-radius: var(--radius-inner);
+      padding: 8px 12px;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    select:focus, input:focus, textarea:focus { border-color: var(--primary); }
+    select:focus, input:focus, textarea:focus {
+      background: var(--surface-card);
+      border-color: var(--brand-red);
+      box-shadow: 0 0 0 3px rgba(230, 0, 18, 0.12);
+    }
+
+    /* Apple × Editorial 按钮系统 */
     .btn {
-      display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
-      border-radius: 999px; border: 1px solid var(--stroke); background: var(--surface);
-      color: var(--on-surface); font-size: 12.5px; font-weight: 500; cursor: pointer; transition: 0.15s;
+      font-family: var(--ff-unified);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 15px;
+      border-radius: 999px;
+      border: 1.5px solid var(--ink-black);
+      background: var(--surface-card);
+      color: var(--ink-black);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
     }
-    .btn:hover { background: var(--surface-hover); }
-    .btn-primary { background: var(--primary); color: #fff; border-color: transparent; }
-    .btn-primary:hover { opacity: 0.9; background: var(--primary); }
-    .btn-xs { padding: 3px 9px; font-size: 11.5px; }
+    .btn:hover {
+      background: var(--ink-black);
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+    .btn-red {
+      background: var(--brand-red);
+      color: #FFFFFF;
+      border-color: var(--brand-red);
+    }
+    .btn-red:hover {
+      background: #B8000E;
+      border-color: #B8000E;
+      color: #FFFFFF;
+    }
+    .btn-xs {
+      padding: 4px 11px;
+      font-size: 12px;
+    }
 
-    /* Rating Badges */
-    .badge { padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; font-family: var(--ff-mono); }
-    .badge-s { background: var(--primary-bg); color: var(--primary); }
-    .badge-b { background: var(--positive-bg); color: var(--positive); }
-    .badge-c { background: var(--danger-bg); color: var(--danger); }
+    /* 企业等级印章 */
+    .rank-pill {
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-family: var(--ff-mono);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .rank-s { background: var(--brand-red); color: #FFFFFF; }
+    .rank-b { background: var(--ink-black); color: #FFFFFF; }
+    .rank-c { background: var(--surface-subtle); color: var(--ink-muted); border: 1px solid var(--border-line); }
 
-    /* Main 3-Pane Grid */
+    /* ====== 主工作台三栏画册网格 ====== */
     .workbench {
-      display: grid; grid-template-columns: 310px 1fr 340px;
-      height: calc(100vh - 54px); gap: 10px; padding: 10px;
+      display: grid;
+      grid-template-columns: 330px 1fr 360px;
+      height: calc(100vh - 64px);
+      gap: 16px;
+      padding: 16px 24px;
     }
+
     .pane {
-      background: var(--surface); border: 1px solid var(--stroke); border-radius: var(--radius-m);
-      display: flex; flex-direction: column; overflow: hidden;
+      background: var(--surface-card);
+      border: 1.5px solid var(--border-line);
+      border-radius: var(--radius-apple);
+      box-shadow: var(--shadow-apple);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
+
+    /* 杂志章节头 (Editorial Section Header) */
     .pane-header {
-      padding: 10px 14px; border-bottom: 1px solid var(--stroke);
-      display: flex; justify-content: space-between; align-items: center;
-      font-weight: 600; font-size: 13px; background: var(--surface-dim);
+      padding: 14px 18px;
+      border-bottom: 1.5px solid var(--border-line);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      background: var(--surface-card);
     }
-    .pane-body { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 14px; }
+    .issue-tag {
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--brand-red);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .pane-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--ink-black);
+      letter-spacing: -0.2px;
+    }
+
+    .pane-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
     .split-pane { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-    .split-half { flex: 1; display: flex; flex-direction: column; overflow: hidden; border-bottom: 1px solid var(--stroke); }
+    .split-half { flex: 1; display: flex; flex-direction: column; overflow: hidden; border-bottom: 1.5px solid var(--border-line); padding: 14px 18px; }
     .split-half:last-child { border-bottom: none; }
 
-    /* Section & Cards */
-    .sec-label { font-size: 11.5px; font-weight: 600; color: var(--on-surface-muted); text-transform: uppercase; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
-    .card {
-      background: var(--surface-dim); border: 1px solid var(--stroke); border-radius: var(--radius-s);
-      padding: 10px; display: flex; flex-direction: column; gap: 6px; position: relative;
+    /* 小标题栏 */
+    .sec-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
     }
-    .card-type { font-size: 11px; font-family: var(--ff-mono); font-weight: 600; color: var(--primary); }
-    .card-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 4px; }
+    .sec-title {
+      font-size: 12.5px;
+      font-weight: 900;
+      color: var(--ink-black);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sec-title::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 13px;
+      background: var(--brand-red);
+      border-radius: 2px;
+    }
 
-    /* Keywords Tag Pool */
-    .tag-pool { display: flex; flex-wrap: wrap; gap: 6px; }
+    /* 画册情报卡片 */
+    .ed-card {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border-line);
+      border-radius: var(--radius-inner);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: border-color 0.15s;
+    }
+    .ed-card:hover { border-color: var(--ink-black); }
+    .ed-card-kicker {
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--brand-red);
+      text-transform: uppercase;
+    }
+    .ed-card-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-black);
+      line-height: 1.6;
+    }
+
+    /* 关键词胶囊池 */
+    .tag-pool { display: flex; flex-wrap: wrap; gap: 8px; }
     .tag {
-      padding: 3px 10px; border-radius: 999px; font-size: 12px; background: var(--surface-dim);
-      border: 1px solid var(--stroke); cursor: pointer; user-select: none; transition: 0.15s;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--surface-subtle);
+      color: var(--ink-black);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: 0.15s;
     }
-    .tag.active { background: var(--primary-bg); color: var(--primary); border-color: var(--primary); font-weight: 600; }
-
-    /* Links List */
-    .link-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; background: var(--surface-dim); border-radius: 6px; font-size: 12.5px; }
-    .link-item a { color: var(--primary); text-decoration: none; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 210px; }
-    .link-item a:hover { text-decoration: underline; }
-
-    /* Center Mode Switcher */
-    .segmented { display: flex; background: var(--surface-dim); padding: 3px; border-radius: 999px; gap: 4px; }
-    .seg-btn { flex: 1; border: none; background: transparent; padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; cursor: pointer; color: var(--on-surface-muted); }
-    .seg-btn.active { background: var(--surface); color: var(--on-surface); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-
-    /* Option Choice Box (Method 1) */
-    .choice-box { border-left: 3px solid var(--primary); background: var(--surface-dim); padding: 10px; border-radius: var(--radius-s); margin-top: 6px; }
-    .choice-option {
-      display: flex; justify-content: space-between; align-items: center; gap: 8px;
-      background: var(--surface); border: 1px solid var(--stroke); border-radius: 6px;
-      padding: 8px 10px; margin-top: 6px; cursor: pointer; transition: 0.15s;
+    .tag:hover { border-color: var(--ink-black); }
+    .tag.active {
+      background: var(--brand-red);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(230, 0, 18, 0.25);
     }
-    .choice-option:hover { border-color: var(--primary); }
 
-    /* ES Editor & Socratic Box (Method 2) */
-    .es-textarea { width: 100%; flex: 1; resize: none; font-size: 13.5px; line-height: 1.65; padding: 10px; border-radius: var(--radius-s); }
-    .socratic-box { background: var(--primary-bg); border-radius: var(--radius-s); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .socratic-q { font-weight: 600; font-size: 13px; color: var(--on-surface); }
+    /* 传送门链接列表 */
+    .portal-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--surface-subtle);
+      border-radius: 10px;
+      border-left: 3px solid var(--ink-black);
+    }
+    .portal-item a {
+      color: var(--ink-black);
+      font-weight: 700;
+      font-size: 13.5px;
+      text-decoration: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 220px;
+    }
+    .portal-item a:hover { color: var(--brand-red); }
 
-    /* Modal */
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 99; }
+    /* Apple 风格分段控制器 */
+    .apple-tabs {
+      display: flex;
+      background: var(--surface-subtle);
+      padding: 4px;
+      border-radius: 999px;
+      width: 100%;
+    }
+    .apple-tab {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-family: var(--ff-unified);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .apple-tab.active {
+      background: var(--ink-black);
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* 方式1：A/B/C 选择题卡片 */
+    .decision-deck {
+      background: var(--brand-red-soft);
+      border: 1.5px solid var(--brand-red);
+      border-radius: var(--radius-inner);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .option-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .option-row:hover {
+      border-color: var(--brand-red);
+      transform: translateX(3px);
+    }
+
+    /* 方式2：苏格拉底对话区 */
+    .socratic-card {
+      background: var(--surface-subtle);
+      border-left: 4px solid var(--brand-red);
+      border-radius: var(--radius-inner);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ====== 🚧 极简小工人施工队动画 (Little Workers Under Construction) ====== */
+    .construction-stage {
+      display: none;
+      background: #FFFDF9;
+      border: 2px dashed var(--brand-red);
+      border-radius: var(--radius-inner);
+      padding: 12px 16px;
+      margin: 8px 18px 0 18px;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+    .construction-stage.active {
+      display: flex;
+    }
+    .worker-crew {
+      display: flex;
+      align-items: flex-end;
+      gap: 18px;
+      animation: crewMarch 2.4s infinite ease-in-out;
+    }
+    .worker-svg {
+      width: 38px;
+      height: 42px;
+      overflow: visible;
+    }
+    .worker-leg-1 { animation: legRun1 0.35s infinite alternate ease-in-out; transform-origin: 18px 26px; }
+    .worker-leg-2 { animation: legRun2 0.35s infinite alternate ease-in-out; transform-origin: 18px 26px; }
+    .worker-bounce { animation: bodyBounce 0.35s infinite alternate ease-in-out; }
+    .cargo-box { animation: cargoPulse 0.7s infinite alternate ease-in-out; }
+
+    @keyframes legRun1 { from { transform: rotate(-28deg); } to { transform: rotate(28deg); } }
+    @keyframes legRun2 { from { transform: rotate(28deg); } to { transform: rotate(-28deg); } }
+    @keyframes bodyBounce { from { transform: translateY(0px); } to { transform: translateY(-3px); } }
+    @keyframes cargoPulse { from { transform: scale(0.95); } to { transform: scale(1.05); } }
+    @keyframes crewMarch {
+      0% { transform: translateX(-6px); }
+      50% { transform: translateX(12px); }
+      100% { transform: translateX(-6px); }
+    }
+
+    /* 模态设置框 */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(13,13,13,0.55); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 99; }
     .modal-backdrop.open { display: flex; }
-    .modal { background: var(--surface); border: 1px solid var(--stroke); border-radius: var(--radius-m); width: 420px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .modal { background: var(--surface-card); border: 2px solid var(--ink-black); border-radius: var(--radius-apple); width: 440px; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
   </style>
 </head>
 <body>
 
-  <!-- Topbar -->
-  <header class="topbar">
-    <div class="topbar-left">
-      <span class="brand-title">⚡ DX-JOB-HUNTER</span>
-      <select id="companySelect"></select>
-      <span id="companyBadge" class="badge badge-s">S级</span>
-      <button class="btn btn-xs" onclick="addNewCompany()">+ 新規企業</button>
+  <!-- 顶部杂志刊头 -->
+  <header class="masthead">
+    <div class="masthead-left">
+      <div class="brand-logo">
+        <span class="brand-dot"></span>
+        <span>DX-STUDIO // 2028</span>
+      </div>
+      <select id="companySelect" style="font-weight:700; min-width:210px;"></select>
+      <span id="companyBadge" class="rank-pill rank-s">S-RANK</span>
+      <button class="btn btn-xs" id="btnNewComp" onclick="addNewCompany()">+ 新增企业</button>
     </div>
-    <div class="topbar-right">
-      <span id="syncStatus" style="font-size:12px; color:var(--on-surface-muted);">ローカル保存済</span>
-      <button class="btn btn-xs" onclick="syncGist('pull')">⬇️ Gist Pull</button>
-      <button class="btn btn-xs" onclick="syncGist('push')">⬆️ Gist Push</button>
-      <button class="btn btn-xs" onclick="openSettings()">⚙️ API / Gist 設定</button>
+    <div class="masthead-right">
+      <button class="btn btn-xs btn-red" id="langToggleBtn" onclick="toggleLanguage()">🌐 日本語 / 中文</button>
+      <span id="syncStatus" style="font-family:var(--ff-mono); font-size:11.5px; color:var(--ink-muted);">SAVED</span>
+      <button class="btn btn-xs" onclick="syncGist('pull')">⬇️ Pull</button>
+      <button class="btn btn-xs" onclick="syncGist('push')">⬆️ Push</button>
+      <button class="btn btn-xs" id="btnSettings" onclick="openSettings()">⚙️ API 설정</button>
     </div>
   </header>
 
-  <!-- 3-Pane Workbench -->
+  <!-- 三栏画册工作台 -->
   <main class="workbench">
 
-    <!-- LEFT PANE: Curated Truth (筛选后的纯净档案) -->
+    <!-- 左栏：01 / CURATED TRUTH -->
     <section class="pane">
       <div class="pane-header">
-        <span>📁 左欄：確定情報・キーワード (Truth)</span>
+        <div>
+          <span class="issue-tag">ISSUE 01 // CURATED TRUTH</span>
+          <div class="pane-title" id="lblLeftHeader">企业真相与关键词库</div>
+        </div>
       </div>
       <div class="pane-body">
-        <!-- Part 1: Links & Portals -->
         <div>
-          <div class="sec-label">
-            <span>公式リンク / マイページ</span>
-            <button class="btn btn-xs" onclick="addLink()">+ 追加</button>
+          <div class="sec-bar">
+            <span class="sec-title" id="lblLinks">官方传送门 / マイページ</span>
+            <button class="btn btn-xs" id="btnAddLink" onclick="addLink()">+ 录入</button>
           </div>
           <div id="linksContainer" style="display:flex; flex-direction:column; gap:6px;"></div>
         </div>
 
-        <!-- Part 2: Curated Keywords -->
         <div>
-          <div class="sec-label">
-            <span>核心キーワード (クリックでES連動)</span>
-            <button class="btn btn-xs" onclick="addKeyword()">+ 追加</button>
+          <div class="sec-bar">
+            <span class="sec-title" id="lblKeywords">核心关键词 (点击联动中栏)</span>
+            <button class="btn btn-xs" id="btnAddKw" onclick="addKeyword()">+ 录入</button>
           </div>
           <div id="keywordsContainer" class="tag-pool"></div>
         </div>
 
-        <!-- Part 3: Adopted Insights from Center -->
         <div style="flex:1; display:flex; flex-direction:column;">
-          <div class="sec-label">
-            <span>採用済みインサイト・方針 (確定済)</span>
+          <div class="sec-bar">
+            <span class="sec-title" id="lblCurated">已采纳的战略定调</span>
           </div>
-          <div id="curatedContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+          <div id="curatedContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
         </div>
       </div>
     </section>
 
-    <!-- CENTER PANE: AI Engine & Canvas (中栏全量演算与加工厂) -->
+    <!-- 中栏：02 / AI ENGINE & STUDIO -->
     <section class="pane">
-      <div class="pane-header" style="padding: 8px 14px;">
-        <div class="segmented" style="width: 100%;">
-          <button id="tabBtn1" class="seg-btn active" onclick="switchCenterTab('anatomy')">🔍 モード1：企業解剖・マイページ判定 (方式1)</button>
-          <button id="tabBtn2" class="seg-btn" onclick="switchCenterTab('es')">✍️ モード2：ES キャンバス・壁打ち (方式2)</button>
+      <div class="pane-header" style="flex-direction:column; gap:10px; align-items:stretch;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="issue-tag">ISSUE 02 // AI WORKBENCH</span>
+          <span id="activeContextTag" style="font-family:var(--ff-mono); font-size:12px; font-weight:800; color:var(--brand-red);">#要件定義</span>
+        </div>
+        <div class="apple-tabs">
+          <button id="tabBtn1" class="apple-tab active" onclick="switchCenterTab('anatomy')">01. 企业解剖 & 选项判定 (方式1)</button>
+          <button id="tabBtn2" class="apple-tab" onclick="switchCenterTab('es')">02. ES 杂志画布 & 追问 (方式2)</button>
         </div>
       </div>
 
-      <!-- Center Mode 1: Anatomy & Multiple-Choice Decision -->
-      <div id="centerModeAnatomy" class="pane-body">
-        <div class="card">
-          <div class="sec-label">
-            <span>🌐 公式サイト / 募集要項テキスト投入 (AI 初回解剖)</span>
-            <button class="btn btn-primary btn-xs" onclick="runSourceAnatomy()">⚡ キーワード＆強み抽出</button>
+      <!-- 🚧 极简小工人施工动画条 (AI 思考/搬运资料时自动呼出) -->
+      <div id="constructionBanner" class="construction-stage">
+        <div>
+          <span class="issue-tag" style="color:var(--brand-red);">🚧 UNDER CONSTRUCTION // 現場施工中</span>
+          <div id="constructionText" style="font-weight:900; font-size:14px; color:var(--ink-black);">
+            小工人们正在奋力搬运「四象限矩阵」与企业关键词砖块...
           </div>
-          <textarea id="rawSourceInput" rows="2" placeholder="公式サイトの募集要項や事業紹介をここに貼り付けると、中欄に強み・調査項目・キーワード候補を生成します..."></textarea>
+        </div>
+        <div class="worker-crew">
+          <!-- 1号小工人：戴红安全帽抱红色资料砖奔跑 -->
+          <svg class="worker-svg" viewBox="0 0 40 44">
+            <g class="worker-bounce">
+              <!-- 红色安全帽 -->
+              <path d="M12 10 C12 5, 24 5, 24 10 Z" fill="#E60012"/>
+              <line x1="10" y1="10" x2="26" y2="10" stroke="#E60012" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- 头部与躯干 -->
+              <circle cx="18" cy="13" r="3.5" fill="#0D0D0D"/>
+              <line x1="18" y1="16.5" x2="18" y2="27" stroke="#0D0D0D" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- 手臂抱砖 -->
+              <polyline points="18,19 25,21 29,18" fill="none" stroke="#0D0D0D" stroke-width="2.2" stroke-linecap="round"/>
+              <!-- 搬运的红色DATA资料砖 -->
+              <rect class="cargo-box" x="25" y="11" width="13" height="10" rx="2" fill="#E60012"/>
+              <text x="27" y="18" fill="#FFF" font-size="6" font-family="monospace" font-weight="bold">DX</text>
+            </g>
+            <line class="worker-leg-1" x1="18" y1="27" x2="12" y2="38" stroke="#0D0D0D" stroke-width="2.5" stroke-linecap="round"/>
+            <line class="worker-leg-2" x1="18" y1="27" x2="24" y2="38" stroke="#0D0D0D" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+
+          <!-- 2号小工人：推车/扛横梁冲刺 -->
+          <svg class="worker-svg" viewBox="0 0 40 44">
+            <g class="worker-bounce" style="animation-delay: 0.15s;">
+              <path d="M12 10 C12 5, 24 5, 24 10 Z" fill="#E60012"/>
+              <circle cx="18" cy="13" r="3.5" fill="#0D0D0D"/>
+              <line x1="18" y1="16.5" x2="16" y2="27" stroke="#0D0D0D" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="17" y1="20" x2="27" y2="16" stroke="#0D0D0D" stroke-width="2.2" stroke-linecap="round"/>
+              <rect class="cargo-box" x="23" y="9" width="14" height="9" rx="2" fill="#0D0D0D"/>
+              <text x="25" y="16" fill="#FFF" font-size="6" font-family="monospace" font-weight="bold">ES</text>
+            </g>
+            <line class="worker-leg-2" x1="16" y1="27" x2="10" y2="38" stroke="#0D0D0D" stroke-width="2.5" stroke-linecap="round"/>
+            <line class="worker-leg-1" x1="16" y1="27" x2="23" y2="38" stroke="#0D0D0D" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 模式 1：企业解剖 & 选项判定 -->
+      <div id="centerModeAnatomy" class="pane-body">
+        <div class="ed-card" style="background:#FFFFFF; border-width:1.5px;">
+          <div class="sec-bar">
+            <span class="sec-title" id="lblRawInput">粘贴官网募集要项 / 业务介绍</span>
+            <button class="btn btn-red btn-xs" id="btnExtract" onclick="runSourceAnatomy()">⚡ 施工抽取关键词</button>
+          </div>
+          <textarea id="rawSourceInput" rows="2"></textarea>
         </div>
 
-        <!-- Method 1 Decision Output Area -->
         <div id="decisionZone"></div>
 
-        <!-- Staging Cards (All AI generated outputs before filtering) -->
         <div>
-          <div class="sec-label"><span>AI 生成ステージング (必要なものだけ左欄へ採用)</span></div>
-          <div id="stagingContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+          <div class="sec-bar">
+            <span class="sec-title" id="lblStaging">AI 施工暂存区 (筛选有价值的结论移入左栏)</span>
+          </div>
+          <div id="stagingContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
         </div>
       </div>
 
-      <!-- Center Mode 2: ES Canvas & Socratic Questioning -->
+      <!-- 模式 2：ES 画布 & 苏格拉底追问 -->
       <div id="centerModeEs" class="split-pane" style="display:none;">
-        <!-- Top Half: Fixed 400-char ES Canvas -->
-        <div class="split-half" style="padding:12px;">
-          <div class="sec-label">
-            <span>📄 ES リアルタイムキャンバス (上流工程・要件定義軸)</span>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span id="charCount" style="font-family:var(--ff-mono); font-weight:700;">0 / 400 字</span>
-              <button class="btn btn-xs" onclick="copyEs()">コピー</button>
+        <div class="split-half" style="flex: 1.15;">
+          <div class="sec-bar">
+            <span class="sec-title" id="lblEsCanvas">400字 ES 终稿画布 (B端商务日文)</span>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span id="charCount" style="font-family:var(--ff-mono); font-weight:800; color:var(--brand-red);">0 / 400 字</span>
+              <button class="btn btn-xs" id="btnCopyEs" onclick="copyEs()">复制全文</button>
             </div>
           </div>
-          <textarea id="esCanvas" class="es-textarea" oninput="updateCharCount()"></textarea>
+          <textarea id="esCanvas" style="width:100%; flex:1; resize:none; font-size:14.5px; line-height:1.75; background:#FFFFFF;"></textarea>
         </div>
 
-        <!-- Bottom Half: Socratic Guided Thinking (方式2) -->
-        <div class="split-half" style="padding:12px; overflow-y:auto; gap:10px;">
-          <div class="sec-label">
-            <span>💬 ソクラテス式・壁打ちガイド (方式2：対話でESを磨く)</span>
-            <span id="activeContextTag" style="color:var(--primary); font-family:var(--ff-mono);">連動キーワード: 未選択</span>
+        <div class="split-half" style="flex: 0.85; overflow-y:auto;">
+          <div class="sec-bar">
+            <span class="sec-title" id="lblSocraticTitle">苏格拉底式壁打 (方式2：引导思考)</span>
           </div>
-          <div id="socraticZone" class="socratic-box">
-            <div class="socratic-q" id="socraticQuestion">左欄のキーワードを選択し、右欄下の「ES着想」から「💬 壁打ち開始」を押すと、ここに深掘り質問が表示されます。</div>
-            <textarea id="socraticAnswer" rows="2" placeholder="日本語または中国語の話し言葉で回答を入力...（AIがBtoB仕様の日本語に変換して上のESに統合します）"></textarea>
-            <div style="display:flex; justify-content:flex-end; gap:8px;">
-              <button class="btn btn-primary btn-xs" onclick="submitSocraticAnswer()">✨ 回答をESへ統合反映</button>
+          <div class="socratic-card">
+            <div id="socraticQuestion" style="font-weight:700; font-size:14px; color:var(--ink-black);"></div>
+            <textarea id="socraticAnswer" rows="2" style="background:#FFFFFF;"></textarea>
+            <div style="display:flex; justify-content:flex-end;">
+              <button class="btn btn-red btn-xs" id="btnSubmitAns" onclick="submitSocraticAnswer()">🚧 派遣小人改写并融入 ES</button>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- RIGHT PANE: Notes & ES Inspiration (右栏上下分区) -->
+    <!-- 右栏：03 / FIELD NOTES & INSPIRATION -->
     <section class="pane">
+      <div class="pane-header">
+        <div>
+          <span class="issue-tag">ISSUE 03 // FIELD NOTES</span>
+          <div class="pane-title" id="lblRightHeader">私密情报与个人弹药库</div>
+        </div>
+      </div>
       <div class="split-pane">
-        <!-- Right Top: MyPage / Briefing Notes -> Triggers Method 1 -->
-        <div class="split-half" style="padding:12px;">
-          <div class="sec-label">
-            <span>📝 右上：マイページ・説明会メモ (非公開情報)</span>
+        <!-- 右上：マイページ笔记 -> 方式1 -->
+        <div class="split-half">
+          <div class="sec-bar">
+            <span class="sec-title" id="lblRightTop">右上：マイページ / 说明会一手情报</span>
           </div>
-          <textarea id="mypageNoteInput" style="flex:1; resize:none; margin-bottom:8px;" placeholder="例：TOPPANのマイページで「営業企画1dayインターン」の案内が来た。参加すべきか？ / 説明会で聞いた配属リスクのメモ..."></textarea>
+          <textarea id="mypageNoteInput" style="flex:1; resize:none; margin-bottom:10px;"></textarea>
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; color:var(--on-surface-muted);">→ 中欄「方式1（選択肢）」を起動</span>
-            <button class="btn btn-primary btn-xs" onclick="triggerMethod1()">⚡ 参加価値・方針判定</button>
+            <span id="lblHintM1" style="font-size:12px; font-weight:700; color:var(--ink-muted);">→ 触发中栏「方式1 (选择题)」</span>
+            <button class="btn btn-red btn-xs" id="btnTriggerM1" onclick="triggerMethod1()">⚡ 判定参加价值</button>
           </div>
         </div>
 
-        <!-- Right Bottom: ES Inspiration & Modules -> Triggers Method 2 -->
-        <div class="split-half" style="padding:12px;">
-          <div class="sec-label">
-            <span>💡 右下：ES着想・自己資産モジュール</span>
+        <!-- 右下：ES灵感 -> 方式2 -->
+        <div class="split-half">
+          <div class="sec-bar">
+            <span class="sec-title" id="lblRightBottom">右下：ES 灵感碎片 & 模块积木</span>
           </div>
-          <div style="display:flex; gap:6px; margin-bottom:6px; flex-wrap:wrap;">
-            <button class="btn btn-xs" onclick="insertModule('kyoto')">+ 観光協会(四象限マトリクス)</button>
-            <button class="btn btn-xs" onclick="insertModule('guide')">+ ガイド3年(モジュール化SOP)</button>
+          <div style="display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;">
+            <button class="btn btn-xs" onclick="insertModule('kyoto')">+ 观光协会(四象限矩阵)</button>
+            <button class="btn btn-xs" onclick="insertModule('guide')">+ 导游3年(模块化SOP)</button>
           </div>
-          <textarea id="esIdeaInput" style="flex:1; resize:none; margin-bottom:8px;" placeholder="この企業向けに強調したい経験の断片や、まだ言語化できていないアイデアをメモ..."></textarea>
+          <textarea id="esIdeaInput" style="flex:1; resize:none; margin-bottom:10px;"></textarea>
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; color:var(--on-surface-muted);">→ 中欄「方式2（深掘り対話）」を起動</span>
-            <button class="btn btn-primary btn-xs" onclick="triggerMethod2()">💬 ES 壁打ち開始</button>
+            <span id="lblHintM2" style="font-size:12px; font-weight:700; color:var(--ink-muted);">→ 触发中栏「方式2 (追问引导)」</span>
+            <button class="btn btn-red btn-xs" id="btnTriggerM2" onclick="triggerMethod2()">💬 开始壁打追问</button>
           </div>
         </div>
       </div>
@@ -300,82 +626,153 @@
 
   </main>
 
-  <!-- Settings Modal (API Key & Gist) -->
+  <!-- API / Gist 设置弹窗 -->
   <div id="settingsModal" class="modal-backdrop">
     <div class="modal">
-      <h3 style="font-size:15px;">⚙️ Gemini API & GitHub Gist 設定</h3>
-      <p style="font-size:12px; color:var(--on-surface-muted);">キーはお使いのブラウザ(LocalStorage)にのみ保存され、GitHubリポジトリには一切含まれません。</p>
       <div>
-        <label class="sec-label">Gemini API Key (直連推論用)</label>
+        <span class="issue-tag">SYSTEM CONFIG</span>
+        <h3 style="font-size:18px; font-weight:900;">API 密钥与云同步设置</h3>
+      </div>
+      <p style="font-size:12.5px; color:var(--ink-muted);">密钥仅存储在你的本地浏览器缓存中，绝不上传至 GitHub 公共代码库。</p>
+      <div>
+        <label class="sec-title" style="margin-bottom:4px;">Gemini API Key</label>
         <input type="password" id="cfgGeminiKey" style="width:100%;" placeholder="AIzaSy...">
       </div>
       <div>
-        <label class="sec-label">GitHub Personal Access Token (gist権限)</label>
+        <label class="sec-title" style="margin-bottom:4px;">GitHub Token (勾选 gist 权限)</label>
         <input type="password" id="cfgGistToken" style="width:100%;" placeholder="ghp_...">
       </div>
       <div>
-        <label class="sec-label">GitHub Gist ID (クラウド同期先)</label>
-        <input type="text" id="cfgGistId" style="width:100%;" placeholder="例: a1b2c3d4e5f6...">
+        <label class="sec-title" style="margin-bottom:4px;">GitHub Gist ID</label>
+        <input type="text" id="cfgGistId" style="width:100%;" placeholder="a1b2c3d4...">
       </div>
       <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px;">
-        <button class="btn btn-xs" onclick="closeSettings()">キャンセル</button>
-        <button class="btn btn-primary btn-xs" onclick="saveSettings()">保存して閉じる</button>
+        <button class="btn btn-xs" onclick="closeSettings()">取消</button>
+        <button class="btn btn-red btn-xs" onclick="saveSettings()">保存配置</button>
       </div>
     </div>
   </div>
 
   <script>
+    const I18N = {
+      zh: {
+        btnNewComp: "+ 新增企业",
+        btnSettings: "⚙️ 设置",
+        lblLeftHeader: "企业真相与关键词库",
+        lblRightHeader: "私密情报与个人弹药库",
+        lblLinks: "官方传送门 / マイページ",
+        btnAdd: "+ 录入",
+        lblKeywords: "核心关键词 (点击联动中栏)",
+        lblCurated: "已采纳的战略定调",
+        tabBtn1: "01. 企业解剖 & 选项判定 (方式1)",
+        tabBtn2: "02. ES 杂志画布 & 追问 (方式2)",
+        lblRawInput: "粘贴官网募集要项 / 业务介绍",
+        rawPlaceholder: "将官网的募集要项粘贴至此，小工人会为你抽取核心关键词与优势卡片...",
+        btnExtract: "⚡ 施工抽取关键词",
+        lblStaging: "AI 施工暂存区 (筛选有价值的结论移入左栏)",
+        btnAdopt: "← 采纳至左栏",
+        btnDiscard: "丢弃",
+        btnDelete: "删除",
+        lblEsCanvas: "400字 ES 终稿画布 (B端商务日文)",
+        btnCopyEs: "复制全文",
+        lblSocraticTitle: "苏格拉底式壁打 (方式2：引导思考)",
+        socraticDefaultQ: "点击左栏任意「关键词胶囊」，并在右下角填入灵感后点击「💬 开始壁打追问」。",
+        socraticAnsPlaceholder: "直接用中文大白话或日文回答，小工人会将其转化为严谨的就活日文并融入上方 ES...",
+        btnSubmitAns: "🚧 派遣小人改写并融入 ES",
+        lblRightTop: "右上：マイページ / 说明会一手情报",
+        mypagePlaceholder: "例：TOPPAN マイページ里出现了「営業企画1dayインターン」，值得去吗？",
+        lblHintM1: "→ 触发中栏「方式1 (选择题)」",
+        btnTriggerM1: "⚡ 判定参加价值",
+        lblRightBottom: "右下：ES 灵感碎片 & 模块积木",
+        esIdeaPlaceholder: "随手记下想针对这家公司强调的经历细节...",
+        lblHintM2: "→ 触发中栏「方式2 (追问引导)」",
+        btnTriggerM2: "💬 开始壁打追问",
+        workerMsg1: "🚧 施工中：小工人们正在比对你的红线原则，搬运マイページ决策方案...",
+        workerMsg2: "🚧 施工中：小工人们正在拆解企業キーワード，打磨苏格拉底追问与ES砖块..."
+      },
+      ja: {
+        btnNewComp: "+ 新規企業",
+        btnSettings: "⚙️ 設定",
+        lblLeftHeader: "確定情報・キーワード庫",
+        lblRightHeader: "一次情報メモ・自己資産",
+        lblLinks: "公式リンク / マイページ",
+        btnAdd: "+ 追加",
+        lblKeywords: "核心キーワード (クリックで連動)",
+        lblCurated: "採用済みインサイト・方針",
+        tabBtn1: "01. 企業解剖・マイページ判定 (方式1)",
+        tabBtn2: "02. ES キャンバス・壁打ち (方式2)",
+        lblRawInput: "募集要項・企業紹介テキスト投入",
+        rawPlaceholder: "公式サイトの募集要項をここに貼り付けると、作業員がキーワードと強みを抽出します...",
+        btnExtract: "⚡ キーワード抽出着工",
+        lblStaging: "AI 施工ステージング (必要なものだけ左欄へ採用)",
+        btnAdopt: "← 左欄へ採用",
+        btnDiscard: "破棄",
+        btnDelete: "削除",
+        lblEsCanvas: "400字 ES リアルタイム画布 (上流・要件定義軸)",
+        btnCopyEs: "全文コピー",
+        lblSocraticTitle: "ソクラテス式・壁打ちガイド (方式2)",
+        socraticDefaultQ: "左欄のキーワードを選択し、右下の「ES着想」から「💬 壁打ち開始」を押してください。",
+        socraticAnsPlaceholder: "日本語または中国語で回答を入力（作業員がBtoB就活日本語へ変換してESに統合します）...",
+        btnSubmitAns: "🚧 作業員を派遣してESへ統合",
+        lblRightTop: "右上：マイページ・説明会メモ",
+        mypagePlaceholder: "例：TOPPANマイページの「営業企画1dayインターン」、参加すべきか？",
+        lblHintM1: "→ 中欄「方式1（選択肢）」を起動",
+        btnTriggerM1: "⚡ 参加価値を判定",
+        lblRightBottom: "右下：ES着想・経験モジュール",
+        esIdeaPlaceholder: "この企業向けに強調したい経験やアイデアをメモ...",
+        lblHintM2: "→ 中欄「方式2（深掘り対話）」を起動",
+        btnTriggerM2: "💬 壁打ち開始",
+        workerMsg1: "🚧 現場施工中：作業員がマイページ情報を分析し、選択肢を運搬しています...",
+        workerMsg2: "🚧 現場施工中：作業員がキーワードと経験モジュールをESへ組み込んでいます..."
+      }
+    };
+
     const DEFAULT_ES = `私が学生時代に注力したのは、京都観光協会のインターンにおいて、データ分析を通じたプロモーション業務の最適化を行った経験です。\n当時、混雑の偏りとプロモーション効果の属人化が課題でした。そこで私は、小紅書のエンゲージメントデータと現地の混雑度指標を掛け合わせた四象限マトリクスを作成し、潜在需要が高く混雑度の低いエリア（高雄など）を定量的に特定しました。その分析に基づき、情報発信の優先順位をルール化・標準化することで、施策の効果検証を迅速化させました。\nまた、3年間のガイド経験でも、属人化しがちな案内業務をエリア別にモジュール化し、効率的な行程管理の仕組みを構築しました。\nこの経験から、DXの本質は単なる技術導入ではなく、現場の定性的な課題をデータで構造化し、標準ルールを設計することだと学びました。貴社のIT技術職においても、顧客の潜在課題を的確に要件定義へ落とし込み、持続可能なシステム構築に貢献します。`;
 
     const INITIAL_STATE = {
+      lang: "zh",
       currentCompany: "toppan",
       selectedKeyword: "要件定義",
       companies: {
         toppan: {
           name: "TOPPAN (IT技術職)",
-          rating: "S级 (本命)",
-          badgeClass: "badge-s",
-          links: [
-            { title: "TOPPAN 採用マイページ", url: "https://www.toppan.com/ja/career/" }
-          ],
-          keywords: ["要件定義", "セキュアDX", "自治体・金融基盤", "上流工程", "BPOシステム化"],
+          rating: "S-RANK",
+          badgeClass: "rank-s",
+          links: [{ title: "TOPPAN 採用マイページ", url: "https://www.toppan.com/ja/career/" }],
+          keywords: ["要件定義", "セキュアDX", "自治体基盤", "上流工程", "ハイブリッドBPO"],
           curated: [
-            { tag: "強み・本質", text: "巨型総合SIer＋物理セキュリティ製造。官公庁や大企業のセキュアDX・IoT頂層開発を担う。" },
-            { tag: "絶対防衛ライン", text: "「営業企画職（数値ノルマを背負う対客PM）」は絶対回避。IT技術職の上流工程にロックオン。" }
+            { tag: "CORE MODEL", text: "巨型综合 SIer + 物理安全制造。承担官公厅与大企业 Secure DX、IoT 顶层架构开发。" },
+            { tag: "RED LINE", text: "严禁选成「営業企画職」（本质是背负销售指标的对客PM），死锁「IT技術職」上流工程。" }
           ],
           staging: [
-            { tag: "強み分析", text: "ハイブリッドBPO：単なる人海戦術ではなく、デジタルシステムと業務設計をセットで提供するモデル。" },
-            { tag: "要調査(逆質問)", text: "文系未経験でIT職に入社した場合、テスト等の下流工程のみを担う期間は通常どのくらいか？" }
+            { tag: "STRENGTH", text: "Hybrid BPO模式：将底层数字系统开发与业务流程重构打包交付，而非单纯人力外包。" },
+            { tag: "REVERSE Q", text: "文系未経験でIT職に入社した場合、テスト等の下流工程のみを担う期間は通常どのくらいか？" }
           ],
-          mypageNote: "マイページにて「企画営業体験1dayインターン」の案内あり。また、技術職向けの「DXシステム設計ワークショップ」も別日程で募集中。",
-          esIdea: "観光協会の四象限マトリクスで「属人的なプロモーションを上流のルール設計で標準化した経験」を、TOPPANのハイブリッドBPOの要件定義に結びつけたい。",
+          mypageNote: "マイページ里放出了「企画営業体験1dayインターン」，同时也有技术职向的「DXシステム設計ワークショップ」。",
+          esIdea: "把京都观光协会的四象限矩阵（将属人化宣发转化为标准化规则）对接到 TOPPAN 的 Hybrid BPO 要件定义上。",
           esText: DEFAULT_ES
         },
         cybozu: {
           name: "サイボウズ (Cybozu)",
-          rating: "S级 (本命)",
-          badgeClass: "badge-s",
+          rating: "S-RANK",
+          badgeClass: "rank-s",
           links: [{ title: "サイボウズ 新卒採用", url: "https://cybozu.co.jp/company/job/recruitment/" }],
           keywords: ["kintone", "ノーコードBPA", "業務標準化", "公明正大", "自立と議論"],
           curated: [
-            { tag: "強み・本質", text: "純正SaaSメーカー。kintoneを核に非IT現場の業務プロセス自動化（BPA）を推進。フルリモート制度完備。" }
+            { tag: "CORE MODEL", text: "纯正 SaaS 厂商。以 kintone 为核心推动非 IT 现场的业务流程自动化（BPA），支持全远程办公。" }
           ],
-          staging: [
-            { tag: "要調査(逆質問)", text: "パートナー（代理店）営業への依存度が高い中、新卒ビジネス職がプロダクト企画や社内ルール設計に関わる比率はどの程度か？" }
-          ],
+          staging: [],
           mypageNote: "",
-          esIdea: "3年間のガイド経験をkintoneのアプリ化発想（非定型業務のモジュール化）として語りたい。",
+          esIdea: "将3年导游路线模块化SOP的经验，包装成 kintone 的 No-code 业务应用构建思维。",
           esText: DEFAULT_ES.replace("貴社のIT技術職においても", "貴社の業務プロセス自動化（BPA）やプロダクト企画においても")
         },
         zebra: {
           name: "ZEBRA (社内SE/企画)",
-          rating: "B级 (保底)",
-          badgeClass: "badge-b",
+          rating: "B-RANK",
+          badgeClass: "rank-b",
           links: [],
-          keywords: ["社内SE", "コストセンター", "基幹システム刷新", "業務効率化"],
-          curated: [
-            { tag: "リスク警告", text: "伝統メーカーのIT部門は発言権が弱い傾向。文系総合職採用の場合、初期配属で文具営業に回されるリスクを必ず確認すること。" }
-          ],
+          keywords: ["社内SE", "コストセンター", "基幹システム刷新"],
+          curated: [{ tag: "WARNING", text: "传统制造企业 IT 部门属于成本中心，需防范文科综合职初期被下放跑文具店销售的风险。" }],
           staging: [],
           mypageNote: "",
           esIdea: "",
@@ -383,29 +780,77 @@
         },
         tobu: {
           name: "東武トップツアーズ",
-          rating: "C级 (練習台)",
-          badgeClass: "badge-c",
+          rating: "C-RANK",
+          badgeClass: "rank-c",
           links: [],
-          keywords: ["自治体BPO", "オペレーション代行", "逆質問テスト用"],
-          curated: [
-            { tag: "位置づけ", text: "伝統旅行会社の人海戦術型BPO。面接練習および「偽DX刺し穿ち逆質問」のテストベッドとしてのみ活用。" }
-          ],
+          keywords: ["自治体BPO", "オペレーション代行", "逆質問テスト"],
+          curated: [{ tag: "POSITION", text: "传统旅行社人海战术型 BPO。仅用于面试抗压练习与测试刺穿虚假 DX 的逆質問。" }],
           staging: [],
-          mypageNote: "10月14日 学内説明会・担当者面談のフィードバック記録用。",
+          mypageNote: "10月14日 校内说明会/工作人员面谈反馈记录。",
           esIdea: "",
           esText: DEFAULT_ES
         }
       }
     };
 
-    let state = JSON.parse(localStorage.getItem("dx_workbench_v1")) || INITIAL_STATE;
+    let state = JSON.parse(localStorage.getItem("dx_editorial_v2")) || INITIAL_STATE;
+    if (!state.lang) state.lang = "zh";
+
+    function t(k) { return I18N[state.lang][k] || k; }
+
+    function toggleLanguage() {
+      state.lang = state.lang === "zh" ? "ja" : "zh";
+      saveState();
+      renderAll();
+    }
 
     function saveState() {
-      localStorage.setItem("dx_workbench_v1", JSON.stringify(state));
-      document.getElementById("syncStatus").textContent = "ローカル保存済 (" + new Date().toLocaleTimeString() + ")";
+      localStorage.setItem("dx_editorial_v2", JSON.stringify(state));
+      document.getElementById("syncStatus").textContent = "SAVED " + new Date().toLocaleTimeString();
+    }
+
+    // 呼出/隐藏极简小工人施工条
+    function showWorkers(msg, duration = 900) {
+      const banner = document.getElementById("constructionBanner");
+      document.getElementById("constructionText").textContent = msg;
+      banner.classList.add("active");
+      return new Promise(resolve => setTimeout(() => {
+        banner.classList.remove("active");
+        resolve();
+      }, duration));
     }
 
     function renderAll() {
+      document.getElementById("langToggleBtn").textContent = state.lang === "zh" ? "🌐 日本語モードへ" : "🌐 中文模式";
+      document.getElementById("btnNewComp").textContent = t("btnNewComp");
+      document.getElementById("btnSettings").textContent = t("btnSettings");
+      document.getElementById("lblLeftHeader").textContent = t("lblLeftHeader");
+      document.getElementById("lblRightHeader").textContent = t("lblRightHeader");
+      document.getElementById("lblLinks").textContent = t("lblLinks");
+      document.getElementById("btnAddLink").textContent = t("btnAdd");
+      document.getElementById("lblKeywords").textContent = t("lblKeywords");
+      document.getElementById("btnAddKw").textContent = t("btnAdd");
+      document.getElementById("lblCurated").textContent = t("lblCurated");
+      document.getElementById("tabBtn1").textContent = t("tabBtn1");
+      document.getElementById("tabBtn2").textContent = t("tabBtn2");
+      document.getElementById("lblRawInput").textContent = t("lblRawInput");
+      document.getElementById("rawSourceInput").placeholder = t("rawPlaceholder");
+      document.getElementById("btnExtract").textContent = t("btnExtract");
+      document.getElementById("lblStaging").textContent = t("lblStaging");
+      document.getElementById("lblEsCanvas").textContent = t("lblEsCanvas");
+      document.getElementById("btnCopyEs").textContent = t("btnCopyEs");
+      document.getElementById("lblSocraticTitle").textContent = t("lblSocraticTitle");
+      document.getElementById("socraticAnswer").placeholder = t("socraticAnsPlaceholder");
+      document.getElementById("btnSubmitAns").textContent = t("btnSubmitAns");
+      document.getElementById("lblRightTop").textContent = t("lblRightTop");
+      document.getElementById("mypageNoteInput").placeholder = t("mypagePlaceholder");
+      document.getElementById("lblHintM1").textContent = t("lblHintM1");
+      document.getElementById("btnTriggerM1").textContent = t("btnTriggerM1");
+      document.getElementById("lblRightBottom").textContent = t("lblRightBottom");
+      document.getElementById("esIdeaInput").placeholder = t("esIdeaPlaceholder");
+      document.getElementById("lblHintM2").textContent = t("lblHintM2");
+      document.getElementById("btnTriggerM2").textContent = t("btnTriggerM2");
+
       const compSelect = document.getElementById("companySelect");
       compSelect.innerHTML = Object.keys(state.companies).map(k =>
         `<option value="${k}" ${k === state.currentCompany ? 'selected' : ''}>${state.companies[k].name}</option>`
@@ -414,83 +859,72 @@
       const comp = state.companies[state.currentCompany];
       const badge = document.getElementById("companyBadge");
       badge.textContent = comp.rating;
-      badge.className = "badge " + (comp.badgeClass || "badge-s");
+      badge.className = "rank-pill " + (comp.badgeClass || "rank-s");
 
-      // Render Links
       document.getElementById("linksContainer").innerHTML = comp.links.map((l, idx) => `
-        <div class="link-item">
-          <a href="${l.url}" target="_blank" rel="noopener">🔗 ${l.title}</a>
+        <div class="portal-item">
+          <a href="${l.url}" target="_blank" rel="noopener">↗ ${l.title}</a>
           <button class="btn btn-xs" onclick="removeLink(${idx})">×</button>
         </div>
-      `).join('') || `<div style="font-size:12px; color:var(--on-surface-muted);">登録されたリンクはありません</div>`;
+      `).join('');
 
-      // Render Keywords
       document.getElementById("keywordsContainer").innerHTML = comp.keywords.map(kw => `
-        <span class="tag ${state.selectedKeyword === kw ? 'active' : ''}" onclick="selectKeyword('${kw}')"># ${kw}</span>
+        <span class="tag ${state.selectedKeyword === kw ? 'active' : ''}" onclick="selectKeyword('${kw}')">#${kw}</span>
       `).join('');
-      document.getElementById("activeContextTag").textContent = `連動キーワード: #${state.selectedKeyword || '未選択'}`;
+      document.getElementById("activeContextTag").textContent = `FOCUS // #${state.selectedKeyword || '-'}`;
 
-      // Render Curated Truth
       document.getElementById("curatedContainer").innerHTML = comp.curated.map((item, idx) => `
-        <div class="card">
-          <div style="display:flex; justify-content:space-between;">
-            <span class="card-type">📌 ${item.tag}</span>
-            <button class="btn btn-xs" onclick="removeCurated(${idx})">削除</button>
+        <div class="ed-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="ed-card-kicker">■ ${item.tag}</span>
+            <button class="btn btn-xs" onclick="removeCurated(${idx})">${t("btnDelete")}</button>
           </div>
-          <div>${item.text}</div>
+          <div class="ed-card-text">${item.text}</div>
         </div>
       `).join('');
 
-      // Render Center Staging
       document.getElementById("stagingContainer").innerHTML = comp.staging.map((item, idx) => `
-        <div class="card">
-          <span class="card-type">✨ AI抽出: ${item.tag}</span>
-          <div>${item.text}</div>
-          <div class="card-actions">
-            <button class="btn btn-xs" onclick="adoptToLeft(${idx})">← 左欄へ採用</button>
-            <button class="btn btn-xs" onclick="removeStaging(${idx})">破棄</button>
+        <div class="ed-card" style="background:#FFFFFF;">
+          <span class="ed-card-kicker">● STAGING // ${item.tag}</span>
+          <div class="ed-card-text">${item.text}</div>
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:4px;">
+            <button class="btn btn-red btn-xs" onclick="adoptToLeft(${idx})">${t("btnAdopt")}</button>
+            <button class="btn btn-xs" onclick="removeStaging(${idx})">${t("btnDiscard")}</button>
           </div>
         </div>
-      `).join('') || `<div style="font-size:12px; color:var(--on-surface-muted);">ステージング中の項目はありません</div>`;
+      `).join('');
 
-      // Render Right Inputs & Center ES
+      if (!document.getElementById("socraticQuestion").dataset.customized) {
+        document.getElementById("socraticQuestion").textContent = t("socraticDefaultQ");
+      }
+
       document.getElementById("mypageNoteInput").value = comp.mypageNote || "";
       document.getElementById("esIdeaInput").value = comp.esIdea || "";
       document.getElementById("esCanvas").value = comp.esText || DEFAULT_ES;
       updateCharCount();
     }
 
-    // Event bindings
     document.getElementById("companySelect").addEventListener("change", (e) => {
       state.currentCompany = e.target.value;
-      const firstKw = state.companies[state.currentCompany].keywords[0] || "";
-      state.selectedKeyword = firstKw;
+      state.selectedKeyword = state.companies[state.currentCompany].keywords[0] || "";
       document.getElementById("decisionZone").innerHTML = "";
-      saveState();
-      renderAll();
+      delete document.getElementById("socraticQuestion").dataset.customized;
+      saveState(); renderAll();
     });
 
     document.getElementById("mypageNoteInput").addEventListener("input", (e) => {
-      state.companies[state.currentCompany].mypageNote = e.target.value;
-      saveState();
+      state.companies[state.currentCompany].mypageNote = e.target.value; saveState();
     });
-
     document.getElementById("esIdeaInput").addEventListener("input", (e) => {
-      state.companies[state.currentCompany].esIdea = e.target.value;
-      saveState();
+      state.companies[state.currentCompany].esIdea = e.target.value; saveState();
     });
-
     document.getElementById("esCanvas").addEventListener("input", (e) => {
-      state.companies[state.currentCompany].esText = e.target.value;
-      updateCharCount();
-      saveState();
+      state.companies[state.currentCompany].esText = e.target.value; updateCharCount(); saveState();
     });
 
     function updateCharCount() {
       const len = document.getElementById("esCanvas").value.replace(/\n/g, "").length;
-      const el = document.getElementById("charCount");
-      el.textContent = `${len} / 400 字`;
-      el.style.color = len > 420 ? "var(--danger)" : "var(--on-surface)";
+      document.getElementById("charCount").textContent = `${len} / 400 字`;
     }
 
     function switchCenterTab(mode) {
@@ -501,90 +935,53 @@
       document.getElementById("centerModeEs").style.display = isAnatomy ? "none" : "flex";
     }
 
-    function selectKeyword(kw) {
-      state.selectedKeyword = kw;
-      saveState();
-      renderAll();
-    }
-
+    function selectKeyword(kw) { state.selectedKeyword = kw; saveState(); renderAll(); }
     function adoptToLeft(idx) {
       const comp = state.companies[state.currentCompany];
-      const item = comp.staging.splice(idx, 1)[0];
-      comp.curated.unshift(item);
-      saveState();
-      renderAll();
+      comp.curated.unshift(comp.staging.splice(idx, 1)[0]);
+      saveState(); renderAll();
     }
-
-    function removeStaging(idx) {
-      state.companies[state.currentCompany].staging.splice(idx, 1);
-      saveState();
-      renderAll();
-    }
-
-    function removeCurated(idx) {
-      state.companies[state.currentCompany].curated.splice(idx, 1);
-      saveState();
-      renderAll();
-    }
+    function removeStaging(idx) { state.companies[state.currentCompany].staging.splice(idx, 1); saveState(); renderAll(); }
+    function removeCurated(idx) { state.companies[state.currentCompany].curated.splice(idx, 1); saveState(); renderAll(); }
 
     function addLink() {
-      const title = prompt("リンクのタイトル（例：マイページ / 募集要項）：");
-      if (!title) return;
-      const url = prompt("URLを入力：", "https://");
-      if (!url) return;
-      state.companies[state.currentCompany].links.push({ title, url });
-      saveState();
-      renderAll();
+      const title = prompt("Title:"); if (!title) return;
+      const url = prompt("URL:", "https://"); if (!url) return;
+      state.companies[state.currentCompany].links.push({ title, url }); saveState(); renderAll();
     }
-
-    function removeLink(idx) {
-      state.companies[state.currentCompany].links.splice(idx, 1);
-      saveState();
-      renderAll();
-    }
-
+    function removeLink(idx) { state.companies[state.currentCompany].links.splice(idx, 1); saveState(); renderAll(); }
     function addKeyword() {
-      const kw = prompt("追加するキーワードを入力（例：要件定義 / 自治体DX）：");
-      if (!kw) return;
+      const kw = prompt("Keyword:"); if (!kw) return;
       state.companies[state.currentCompany].keywords.push(kw.trim());
-      state.selectedKeyword = kw.trim();
-      saveState();
-      renderAll();
+      state.selectedKeyword = kw.trim(); saveState(); renderAll();
     }
-
     function addNewCompany() {
       const key = "comp_" + Date.now();
-      const name = prompt("企業名と職種を入力（例：SCSK - SE職）：");
-      if (!name) return;
-      const rating = prompt("初期ランクを入力（例：S级 / A级 / B级）：", "S级");
+      const name = prompt("Company & Role (e.g. SCSK - SE):"); if (!name) return;
       state.companies[key] = {
-        name, rating, badgeClass: rating.includes("S") ? "badge-s" : "badge-b",
+        name, rating: "S-RANK", badgeClass: "rank-s",
         links: [], keywords: ["要件定義", "DX推進"], curated: [], staging: [],
         mypageNote: "", esIdea: "", esText: DEFAULT_ES
       };
-      state.currentCompany = key;
-      saveState();
-      renderAll();
+      state.currentCompany = key; saveState(); renderAll();
     }
 
     function insertModule(type) {
       const box = document.getElementById("esIdeaInput");
       const text = type === 'kyoto'
-        ? "【京都観光協会インターン】小紅書エンゲージメント×現地混雑度の四象限マトリクスを構築し、高雄エリア等のプロモーション優先度を定量化・標準化。"
-        : "【京都ガイド3年】属人化していた現場ルート案内とトラブル対応を、エリア別モジュールとしてSOP（標準作業手順）にカプセル化。";
+        ? "【京都観光協会】小紅書データ×現地混雑度の四象限マトリクスを構築し、高雄等の宣発優先度を定量化・標準化。"
+        : "【京都ガイド3年】属人化していた案内業務と突発対応を、エリア別モジュールとしてSOP（標準作業手順）に封装。";
       box.value = (box.value ? box.value + "\n" : "") + text;
-      state.companies[state.currentCompany].esIdea = box.value;
-      saveState();
+      state.companies[state.currentCompany].esIdea = box.value; saveState();
     }
 
-    // Gemini API Helper
     async function callGemini(promptText) {
       const key = localStorage.getItem("cfg_gemini_key");
       if (!key) return null;
-      const sysPrompt = `あなたは京都産業大学法政策学科3年（28卒）の就活生専属のDX/IT戦略参謀です。
-ユーザーの絶対条件：伝統旅行業や泥臭い営業、低単価人海戦術BPOを完全回避し、IT技術職（上流工程・要件定義）、SaaS企画、BPA（業務プロセス自動化）、関西勤務またはリモートワークを狙う。
-強み：京都観光協会インターン（小紅書データ×混雑度の四象限マトリクスによる宣発標準化）と3年間のガイド経験（非定型案内のモジュール化SOP）。
-無駄な褒め言葉や挨拶を一切省き、高密度な結論のみを出力せよ。`;
+      const langRule = state.lang === "zh"
+        ? "使用高信息密度中文输出（日本就活专有名词如ES、要件定義、上流工程保留日文）。"
+        : "すべて洗練されたビジネス日本語で高密度に出力せよ。";
+      const sysPrompt = `你是京都产业大学法政策学科大三（28卒）学生的专属DX/IT求职参谋。红线：避开传统旅游业、泥臭い営業、低端人海BPO；锁定IT技術職（上流工程・要件定義）、SaaS企划、BPA、关西或远程。核心资产：京都观光协会四象限矩阵与3年导游SOP模块化。${langRule}`;
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
         method: "POST",
@@ -598,50 +995,38 @@
       return data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
     }
 
-    // Method 1: Trigger Value Judgment & Multiple Choice from Top-Right Note
     async function triggerMethod1() {
       switchCenterTab('anatomy');
       const comp = state.companies[state.currentCompany];
       const note = document.getElementById("mypageNoteInput").value.trim();
-      if (!note) { alert("右上のマイページ・説明会メモに入力してください。"); return; }
+      if (!note) return;
+
+      const workerPromise = showWorkers(t("workerMsg1"), 1100);
+      const aiResp = await callGemini(`针对企业「${comp.name}」，用户右上角情报：「${note}」。给出参加价值判定与A/B/C三个行动选项。`);
+      await workerPromise;
 
       const zone = document.getElementById("decisionZone");
-      zone.innerHTML = `<div class="choice-box">⚡ 方式1（選択肢判定）を演算中...</div>`;
-
-      const aiResp = await callGemini(`企業「${comp.name}」に関するユーザーのメモ：「${note}」
-以下のフォーマットで参加価値判定と3つの具体的な行動選択肢（A, B, C）を簡潔に出力してください：
-判定結論：[推奨度と理由を1文で]
-選択肢A：[行動案A]
-選択肢B：[行動案B]
-選択肢C：[行動案C]`);
-
       if (aiResp) {
-        const lines = aiResp.split("\n").filter(l => l.trim());
         zone.innerHTML = `
-          <div class="choice-box">
-            <div class="sec-label"><span>🎯 マイページ・説明会メモ判定結果 (方式1：クリックで左欄へ採用)</span></div>
-            <div style="font-size:13px; margin-bottom:6px; white-space:pre-wrap;">${aiResp}</div>
-            <div class="card-actions">
-              <button class="btn btn-primary btn-xs" onclick="adoptCustom('マイページ方針', \`${aiResp.replace(/`/g, '')}\`)">← この判定結論を左欄へ採用</button>
+          <div class="decision-deck">
+            <span class="ed-card-kicker">METHOD 01 // DECISION MATRIX</span>
+            <div style="white-space:pre-wrap; font-size:13.5px;">${aiResp}</div>
+            <div style="display:flex; justify-content:flex-end;">
+              <button class="btn btn-red btn-xs" onclick="adoptCustom('マイページ方針', \`${aiResp.replace(/`/g, '')}\`)">${t("btnAdopt")}</button>
             </div>
           </div>`;
       } else {
-        // Built-in interactive fallback when API key is not set
+        const isZh = state.lang === "zh";
         zone.innerHTML = `
-          <div class="choice-box">
-            <div class="sec-label"><span>🎯 マイページ・説明会メモ判定 (方式1：選択肢をクリックして左欄へ確定)</span></div>
-            <div style="font-weight:600; margin-bottom:4px;">入力メモ：「${note}」への戦略オプション：</div>
-            <div class="choice-option" onclick="adoptCustom('インターン・選考方針', '【方針A：技術職特化】営業企画系イベントはスキップし、DXシステム設計・SE上流工程コースのみにリソースを集中する。')">
-              <span><b>選択肢 A（推奨）</b>：営業企画系はスキップし、IT技術職・システム設計コースのみに集中投下する</span>
-              <span class="btn btn-xs">← 採用</span>
+          <div class="decision-deck">
+            <span class="ed-card-kicker">METHOD 01 // 施工完毕：请选择行动方针采纳至左栏</span>
+            <div class="option-row" onclick="adoptCustom('SELECTION POLICY', '${isZh ? "【方针A：死锁技术职】直接跳过営業企画类活动，100%集中于DXシステム設計与SE上流工程。" : "【方針A：技術職特化】営業企画系はスキップし、DXシステム設計・SE上流工程のみに集中。"}')">
+              <span><b>OPTION A</b> — ${isZh ? "跳过営業企画，只参加技术职/系统设计工作坊" : "営業企画系はスキップし、技術職コースのみに集中"}</span>
+              <span class="btn btn-red btn-xs">${t("btnAdopt")}</span>
             </div>
-            <div class="choice-option" onclick="adoptCustom('インターン・選考方針', '【方針B：早期選考踏み台】参加はするが、GDでは「データマトリクスによる要件整理役」に徹し、泥臭い営業適性をアピールしない。')">
-              <span><b>選択肢 B（踏み台活用）</b>：早期選考ルート確保のため参加しつつ、ワーク内では「データ要件定義役」に徹する</span>
-              <span class="btn btn-xs">← 採用</span>
-            </div>
-            <div class="choice-option" onclick="adoptCustom('要調査・逆質問', '【方針C：現場確認】面談・座談会にて「文系出身者が初期配属で営業に回される比率」を逆質問で直接刺す。')">
-              <span><b>選択肢 C（逆質問で検証）</b>：文系配属ガチャのリスクを座談会の逆質問リストに組み込む</span>
-              <span class="btn btn-xs">← 採用</span>
+            <div class="option-row" onclick="adoptCustom('SELECTION POLICY', '${isZh ? "【方针B：借壳拿早期选考券】参加但在GD中强行扮演「用数据矩阵制定规则的PM/SE」角色。" : "【方針B：早期選考踏み台】参加はするが、GDではデータマトリクスによる要件整理役に徹する。"}')">
+              <span><b>OPTION B</b> — ${isZh ? "作为跳板参加，但在小组中锁定「数据规则制定者」角色" : "早期選考ルート確保のため参加し、要件定義役に徹する"}</span>
+              <span class="btn btn-xs">${t("btnAdopt")}</span>
             </div>
           </div>`;
       }
@@ -650,97 +1035,78 @@
     function adoptCustom(tag, text) {
       state.companies[state.currentCompany].curated.unshift({ tag, text });
       document.getElementById("decisionZone").innerHTML = "";
-      saveState();
-      renderAll();
+      saveState(); renderAll();
     }
 
-    // Method 2: Trigger Socratic Questioning from Bottom-Right Idea + Left Keyword
     async function triggerMethod2() {
       switchCenterTab('es');
       const comp = state.companies[state.currentCompany];
       const idea = document.getElementById("esIdeaInput").value.trim();
       const kw = state.selectedKeyword || comp.keywords[0] || "要件定義";
       const qEl = document.getElementById("socraticQuestion");
-      qEl.textContent = "💬 方式2：深掘り質問を生成中...";
+      qEl.dataset.customized = "true";
 
-      const aiQuestion = await callGemini(`対象企業：${comp.name}
-注目キーワード：#${kw}
-ユーザーのES着想メモ：${idea || '観光協会の四象限マトリクスとガイド標準化'}
-現在のES草稿：${comp.esText}
-このキーワード「#${kw}」をESにより鋭く組み込むために、ユーザーの原体験の具体性を引き出す「ソクラテス式の深掘り質問」を1つだけ（100字以内で）投げかけてください。`);
+      const workerPromise = showWorkers(t("workerMsg2"), 1100);
+      const aiQ = await callGemini(`企业：${comp.name}，关键词：#${kw}，右下角灵感：「${idea}」。提出1个一针见血的苏格拉底式追问（80字内）。`);
+      await workerPromise;
 
-      if (aiQuestion) {
-        qEl.textContent = `【#${kw} × 深掘り質問】 ${aiQuestion}`;
+      if (aiQ) {
+        qEl.textContent = `[#${kw}] ${aiQ}`;
       } else {
-        qEl.textContent = `【#${kw} × 深掘り質問】 あなたのメモにある経験を「${comp.name}」の『#${kw}』に直結させる場合、現場のルールを標準化した結果、「周囲のスタッフや組織全体の作業工数が具体的にどう変わったか（定量的・構造的変化）」を1文で教えてください。`;
+        qEl.textContent = state.lang === "zh"
+          ? `【#${kw} 施工追问】你要把「${idea || '四象限矩阵与导游SOP'}」对接到 ${comp.name} 的「#${kw}」上，当时这套标准规则落地后，团队返工减少或效率提升的具体成果是什么？`
+          : `【#${kw} 深掘り】その経験を「${comp.name}」の『#${kw}』に直結させる場合、標準化によって周囲の作業工数がどう変化したか1文で教えてください。`;
       }
     }
 
     async function submitSocraticAnswer() {
       const ans = document.getElementById("socraticAnswer").value.trim();
-      if (!ans) { alert("回答を入力してください。"); return; }
+      if (!ans) return;
       const comp = state.companies[state.currentCompany];
       const kw = state.selectedKeyword || "要件定義";
-      const btn = event.target;
-      btn.textContent = "統合中...";
 
-      const refinedEs = await callGemini(`対象企業：${comp.name}（キーワード：#${kw}）
-現在のES（約400字）：
-${comp.esText}
-
-壁打ち質問に対するユーザーの回答：
-「${ans}」
-
-この回答の要素をBtoBの上流工程・要件定義の視点に変換し、現在のESに自然に組み込んで380〜400字の完成された日本語ESに書き直してください。出力は書き直したES本文のみとすること。`);
+      const workerPromise = showWorkers(t("workerMsg2"), 1200);
+      const refinedEs = await callGemini(`対象企業：${comp.name}（#${kw}）\n現在のES：\n${comp.esText}\n回答メモ：「${ans}」\n上記の回答をBtoBの上流工程・要件定義の視点に昇華させ、380〜400字の就活ビジネス日本語ES本文のみを出力せよ。`);
+      await workerPromise;
 
       if (refinedEs) {
         comp.esText = refinedEs.trim();
       } else {
-        // Fallback smart tail integration when API key is not configured
         comp.esText = comp.esText.replace(
           /貴社の.*貢献します。$/,
-          `特に「${ans}」という現場標準化の知見を活かし、貴社の「${kw}」推進においても、潜在課題を的確に要件定義へ落とし込み、持続可能なシステム構築に貢献します。`
+          `この標準化推進の知見を活かし、貴社の「${kw}」においても潜在課題を的確に要件定義へ落とし込み、持続可能なシステム構築に貢献します。`
         );
       }
       document.getElementById("socraticAnswer").value = "";
-      btn.textContent = "✨ 回答をESへ統合反映";
-      saveState();
-      renderAll();
+      saveState(); renderAll();
     }
 
     async function runSourceAnatomy() {
       const raw = document.getElementById("rawSourceInput").value.trim();
-      if (!raw) { alert("募集要項や企業ページのテキストを貼り付けてください。"); return; }
+      if (!raw) return;
       const comp = state.companies[state.currentCompany];
-      const aiOut = await callGemini(`以下の企業テキストを分析し、1行目に「KEYWORDS: キーワード1, キーワード2, キーワード3」、2行目以降に「強み分析: 内容」「要調査: 内容」の形式で出力せよ：\n${raw}`);
+      const workerPromise = showWorkers(t("workerMsg1"), 1100);
+      const aiOut = await callGemini(`分析以下企业文本，第1行输出「KEYWORDS: 詞1, 詞2」，第2行起每行输出一条「STRENGTH: ...」或「CHECK: ...」：\n${raw}`);
+      await workerPromise;
 
       if (aiOut) {
-        const lines = aiOut.split("\n").map(l => l.trim()).filter(Boolean);
-        lines.forEach(line => {
+        aiOut.split("\n").map(l => l.trim()).filter(Boolean).forEach(line => {
           if (line.startsWith("KEYWORDS:")) {
-            const kws = line.replace("KEYWORDS:", "").split(",").map(s => s.trim()).filter(Boolean);
-            kws.forEach(k => { if (!comp.keywords.includes(k)) comp.keywords.push(k); });
+            line.replace("KEYWORDS:", "").split(",").map(s => s.trim()).filter(Boolean).forEach(k => {
+              if (!comp.keywords.includes(k)) comp.keywords.push(k);
+            });
           } else {
-            comp.staging.unshift({ tag: "AI解剖", text: line });
+            comp.staging.unshift({ tag: "AI EXTRACT", text: line });
           }
         });
       } else {
-        comp.staging.unshift(
-          { tag: "強み抽出", text: `投入テキストより抽出：上流の業務設計（BPA）とセキュリティ基盤の統合ソリューションが主力。` },
-          { tag: "要調査項目", text: `初期配属における開発・要件定義フェーズへの関与比率を面談で確認すること。` }
-        );
+        comp.staging.unshift({ tag: "EXTRACTED", text: "上流の業務設計（BPA）とセキュア基盤の統合ソリューションが主力。" });
       }
       document.getElementById("rawSourceInput").value = "";
-      saveState();
-      renderAll();
+      saveState(); renderAll();
     }
 
-    function copyEs() {
-      navigator.clipboard.writeText(document.getElementById("esCanvas").value);
-      alert("ES全文をクリップボードにコピーしました。");
-    }
-
-    // Settings & GitHub Gist Sync
+    function copyEs() { navigator.clipboard.writeText(document.getElementById("esCanvas").value); }
     function openSettings() {
       document.getElementById("cfgGeminiKey").value = localStorage.getItem("cfg_gemini_key") || "";
       document.getElementById("cfgGistToken").value = localStorage.getItem("cfg_gist_token") || "";
@@ -755,36 +1121,28 @@ ${comp.esText}
       closeSettings();
     }
 
-    async function syncGist(direction) {
-      const token = localStorage.getItem("cfg_gist_token");
-      const gistId = localStorage.getItem("cfg_gist_id");
+    async function syncGist(dir) {
+      const token = localStorage.getItem("cfg_gist_token"), gistId = localStorage.getItem("cfg_gist_id");
       if (!token || !gistId) { openSettings(); return; }
       const statusEl = document.getElementById("syncStatus");
-      statusEl.textContent = "Gist 同期中...";
+      statusEl.textContent = "SYNCING...";
       try {
-        if (direction === 'push') {
+        if (dir === 'push') {
           await fetch(`https://api.github.com/gists/${gistId}`, {
             method: "PATCH",
             headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" },
             body: JSON.stringify({ files: { "dx_workbench_state.json": { content: JSON.stringify(state, null, 2) } } })
           });
-          statusEl.textContent = "☁️ Gist Push 完了";
+          statusEl.textContent = "PUSH OK";
         } else {
           const res = await fetch(`https://api.github.com/gists/${gistId}`, {
             headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
           });
           const data = await res.json();
           const content = data?.files?.["dx_workbench_state.json"]?.content;
-          if (content) {
-            state = JSON.parse(content);
-            saveState();
-            renderAll();
-            statusEl.textContent = "☁️ Gist Pull 完了";
-          }
+          if (content) { state = JSON.parse(content); saveState(); renderAll(); statusEl.textContent = "PULL OK"; }
         }
-      } catch (e) {
-        statusEl.textContent = "⚠️ 同期エラー";
-      }
+      } catch (e) { statusEl.textContent = "SYNC ERR"; }
     }
 
     renderAll();
